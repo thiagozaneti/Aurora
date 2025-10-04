@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
-from api.routes.analysis import analysis_route
+from app.api.routes.analysis_route.analysis import analysis_route
 
 app = FastAPI()
 app.include_router(analysis_route,prefix="/api/v1")
