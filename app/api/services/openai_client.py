@@ -5,7 +5,6 @@ import os
 import json
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 class TextAnalyzer:
@@ -20,6 +19,7 @@ class TextAnalyzer:
 
         
   def analyze(self, user_text:str) -> Dict[str, any]:
+      user_text = user_text.strip('"').strip("'")
       response = self.client.chat.completions.create(
         model=self.model,
         seed=7,
