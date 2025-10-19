@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException,Body
-from api.models.user_input_models import TextInputUser
+from app.api.schemas.schemas import TextInputUser
 from api.services.openai_client import TextAnalyzer
 
 
