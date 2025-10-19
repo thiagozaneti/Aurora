@@ -1,8 +1,10 @@
-version: '3.8'
+version: "3.9"
+
 services:
   db:
     image: postgres:16
-    container_name: aurora-container
+    container_name: aurora_postgres
+    restart: always
     environment:
       POSTGRES_DB: aurora-database
       POSTGRES_USER: aurora
@@ -10,8 +12,13 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - aurora_data:/var/lib/postgresql/data
+    networks:
+      - aurora_network
 
 volumes:
-  db_data:
+  aurora_data:
 
+networks:
+  aurora_network:
+    driver: bridge

@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException,Body
 from api.models.user_input_models import TextInputUser
 from api.services.openai_client import TextAnalyzer
-import logging
+
 
 analysis_route = APIRouter()
 text_analysis = TextAnalyzer()
-logger = logging.getLogger(__name__)
 
-@analysis_route.get("/analysis/text/kp")
+
+@analysis_route.get("/analysis/text/kp", tags=["Analysis"])
 async def analysisTextKeepAlive():
   return {"Server":"on"}
 
@@ -15,7 +15,6 @@ async def analysisTextKeepAlive():
 async def analysisText(payload:TextInputUser):
   try:
     result = text_analysis.analyze(payload.text)
-    logger.info("Endpoint acessado")
     return result
     
   except Exception as e:

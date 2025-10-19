@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 import uvicorn
-from app.api.routes.analysis_route.analysis import analysis_route
+from api.routes.analysis_route.analysis import analysis_route
+from api.routes.user_route.users import users_route
 
 app = FastAPI()
 app.include_router(analysis_route,prefix="/api/v1")
+app.include_router(users_route,prefix="/api/v1")
 
 
 if __name__ == "__main__":
