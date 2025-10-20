@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException,Body
 from app.api.schemas.schemas import TextInputUser
-from api.services.openai_client import TextAnalyzer
+from app.api.services.openai_client import TextAnalyzer
 
 
 analysis_route = APIRouter()
