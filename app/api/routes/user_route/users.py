@@ -21,7 +21,7 @@ async def user_register(user:User, db_session: Session = Depends(get_session)):
   return JSONResponse(content="Sucesso ao criar usuário", status_code=201)
 
 
-@users_route.post('/login')
+@users_route.post('/login', tags=["Users"])
 def user_register(
     request_form_user: OAuth2PasswordRequestForm = Depends(),
     db_session: Session = Depends(get_session),
@@ -39,6 +39,6 @@ def user_register(
     )
 
 
-@users_route.get('/test')
+@users_route.get('/test',tags=["Testes"])
 def test_user_verify():
     return 'It works'

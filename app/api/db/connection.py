@@ -11,7 +11,7 @@ DB_URL = os.getenv("DB_URL")
 
 engine = create_engine(url=DB_URL,pool_pre_ping=True)
 Session = sessionmaker(bind = engine)
-oauth_scheme = OAuth2PasswordBearer(tokenUrl='/user/login')
+oauth_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
 
 
 def get_session():
@@ -27,4 +27,4 @@ def token_verifier(
     token = Depends(oauth_scheme)
 ):
     uc = UseruseCases(db_session=db_session)
-    uc.verify_token(access_token=token)
+    return uc.verify_token(access_token=token)
