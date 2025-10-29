@@ -1,36 +1,44 @@
-
-from fastapi import APIRouter, HTTPException, Body, Depends
+# app/api/routes/analysis.py
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
 from app.api.schemas.schemas import TextInputUser
 from app.api.aplication.use_cases.user_cases import UseruseCases
 from app.api.services.openai_client import TextAnalyzer
-from app.api.db.connection import token_verifier
-from sqlalchemy.orm import Session
-from app.api.db.connection import get_session
-from app.api.db.models import UserModel  
+from app.api.db.connection import token_verifier, get_session
 
 analysis_route = APIRouter()
 text_analysis = TextAnalyzer()
 
 @analysis_route.get("/analysis/text/kp", tags=["Analysis"])
 async def analysisTextKeepAlive():
-    return {"Server":"on"}
+    return {"Server": "on"}
 
 @analysis_route.post("/analysis/text", tags=["Analysis"])
 async def analysisText(
     payload: TextInputUser,
-    current_user = Depends(token_verifier),  
-    db_session: Session = Depends(get_session)
+    current_user = Depends(token_verifier),         
+    db_session: Session = Depends(get_session),
 ):
-    user_case = UseruseCases(db_session=db_session)
     try:
+        if not payload.text or not payload.text.strip():
+            raise HTTPException(status_code=422, detail="Campo 'text' vazio.")
+
         result = text_analysis.analyze(payload.text)
-        saved = user_case.save_essays(
-            user_id=current_user.id,    
-            analysis_result=result,
-            original_text=payload.text
+
+        user_case = UseruseCases(db_session=db_session)
+        saved = user_case.save_essay(
+            user_id=current_user.id,                 
+            input_text=payload.text.strip(),
+            result=result
         )
-        # Devolva o resultado + ID salvo para poder consultar depois
-        return {"essay_id": saved.id, **result}
+
+        return {
+            "id": saved.id,
+            "created_at": saved.created_at,
+            "nota_total": saved.nota_total,
+            "stars": saved.stars,
+            "criterios": result.get("criterios", {}),
+        }
 
     except HTTPException:
         raise

@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 import re
 from pydantic import BaseModel, validator
 
 
 class TextInputUser(BaseModel):
-  text:str
+  text: constr(min_length=1, strip_whitespace=True)
 
 class User(BaseModel):
     username: str

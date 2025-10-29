@@ -26,40 +26,58 @@ class UseruseCases:
     def __init__(self, db_session: Session):
         self.db_session = db_session
 
-    def save_essays(self, *, user_id: int, analysis_result: Dict[str, Any], original_text: str) -> UserEssaysModel:
-        try:
-            c1 = _get_criterio(analysis_result, "coerencia")
-            c2 = _get_criterio(analysis_result, "coesao")
-            c3 = _get_criterio(analysis_result, "norma")
-            c4 = _get_criterio(analysis_result, "repertorio")
-            c5 = _get_criterio(analysis_result, "intervencao")
+    def save_essay(self, user_id: int, input_text: str, result: dict) -> UserEssaysModel:
+        def _get(comp: str, field: str, alt: str = None, default=None):
+            c = (result.get("criterios") or {}).get(comp) or {}
+            v = c.get(field)
+            if v is None and alt is not None:
+                v = c.get(alt)
+            return default if v is None else v
 
-            nota_total = int(analysis_result.get("nota_total") or 0)
+        # C1..C5
+        c1_nota  = int(_get("norma",       "nota",           default=0))
+        c1_obs   = str(_get("norma",       "comentarioC1",   alt="comentario", default=""))
+        c1_stars = int(_get("norma",       "starsC1",        alt="stars",      default=0))
 
-            essay = UserEssaysModel(
-                user_id=user_id,
-                created_at=datetime.utcnow(),
-                c1_nota=c1["nota"], c1_obs=c1["obs"],
-                c2_nota=c2["nota"], c2_obs=c2["obs"],
-                c3_nota=c3["nota"], c3_obs=c3["obs"],
-                c4_nota=c4["nota"], c4_obs=c4["obs"],
-                c5_nota=c5["nota"], c5_obs=c5["obs"],
-                stars=max(0, min(5, (c1["stars"]+c2["stars"]+c3["stars"]+c4["stars"]+c5["stars"]) // 5)),
-                nota_total=nota_total,
-                original_text=original_text  
-            )
+        c2_nota  = int(_get("repertorio",  "nota",           default=0))
+        c2_obs   = str(_get("repertorio",  "comentarioC2",   alt="comentario", default=""))
+        c2_stars = int(_get("repertorio",  "starsC2",        alt="stars",      default=0))
 
-            self.db_session.add(essay)
-            self.db_session.flush()   
-            self.db_session.commit()
-            return essay
+        c3_nota  = int(_get("coerencia",   "nota",           default=0))
+        c3_obs   = str(_get("coerencia",   "comentarioC3",   alt="comentario", default=""))
+        c3_stars = int(_get("coerencia",   "starsC3",        alt="stars",      default=0))
 
-        except IntegrityError:
-            self.db_session.rollback()
-            raise HTTPException(status_code=400, detail="Não foi possível salvar a redação (integridade).")
-        except Exception as e:
-            self.db_session.rollback()
-            raise HTTPException(status_code=500, detail=f"Falha ao salvar redação: {e}")
+        c4_nota  = int(_get("coesao",      "nota",           default=0))
+        c4_obs   = str(_get("coesao",      "comentarioC4",   alt="comentario", default=""))
+        c4_stars = int(_get("coesao",      "starsC4",        alt="stars",      default=0))
+
+        c5_nota  = int(_get("intervencao", "nota",           default=0))
+        c5_obs   = str(_get("intervencao", "comentarioC5",   alt="comentario", default=""))
+        c5_stars = int(_get("intervencao", "starsC5",        alt="stars",      default=0))
+
+        # nota_total do modelo
+        nota_total = int(result.get("nota_total") or (c1_nota + c2_nota + c3_nota + c4_nota + c5_nota))
+
+        stars_total = c1_stars+ c2_stars+ c3_stars+ c4_stars+ c5_stars
+
+        row = UserEssaysModel(
+            user_id=user_id,
+            input_text=input_text or "",
+
+            c1_nota=c1_nota, c1_obs=c1_obs, c1_stars=c1_stars,
+            c2_nota=c2_nota, c2_obs=c2_obs, c2_stars=c2_stars,
+            c3_nota=c3_nota, c3_obs=c3_obs, c3_stars=c3_stars,
+            c4_nota=c4_nota, c4_obs=c4_obs, c4_stars=c4_stars,
+            c5_nota=c5_nota, c5_obs=c5_obs, c5_stars=c5_stars,
+
+            stars=stars_total,
+            nota_total=nota_total,
+        )
+
+        self.db_session.add(row)
+        self.db_session.commit()
+        self.db_session.refresh(row)
+        return row
 
     # ===== seus métodos existentes abaixo =====
     def user_register(self, user:User):

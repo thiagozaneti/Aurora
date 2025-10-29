@@ -43,24 +43,65 @@ SCHEMA = {
     "name": "avaliacao_redacao",
     "schema": {
         "type": "object",
+        # ❌ REMOVE "stars" daqui
         "required": ["criterios", "nota_total"],
         "additionalProperties": False,
         "properties": {
             "criterios": {
                 "type": "object",
-                "required": ["coerencia", "coesao", "norma", "repertorio", "intervencao"],
+                "required": ["norma", "repertorio", "coerencia", "coesao", "intervencao"],
                 "additionalProperties": False,
                 "properties": {
-                    k: {
+                    "norma": {
                         "type": "object",
-                        "required": ["nota", "comentario","stars"],
+                        "required": ["nota", "comentarioC1", "starsC1"],
                         "additionalProperties": False,
                         "properties": {
                             "nota": {"type": "integer", "minimum": 0, "maximum": 200},
-                            "comentario": {"type": "string", "minLength": 1, "maxLength": 400},
-                            "stars": {"type": "integer", "minimum": 0, "maximum": 5},
+                            "comentarioC1": {"type": "string", "minLength": 1, "maxLength": 400},
+                            "starsC1": {"type": "integer", "minimum": 0, "maximum": 5}
                         },
-                    } for k in ["coerencia","coesao","norma","repertorio","intervencao"]
+                    },
+                    "repertorio": {
+                        "type": "object",
+                        "required": ["nota", "comentarioC2", "starsC2"],
+                        "additionalProperties": False,
+                        "properties": {
+                            "nota": {"type": "integer", "minimum": 0, "maximum": 200},
+                            "comentarioC2": {"type": "string", "minLength": 1, "maxLength": 400},
+                            "starsC2": {"type": "integer", "minimum": 0, "maximum": 5}
+                        },
+                    },
+                    "coerencia": {
+                        "type": "object",
+                        "required": ["nota", "comentarioC3", "starsC3"],
+                        "additionalProperties": False,
+                        "properties": {
+                            "nota": {"type": "integer", "minimum": 0, "maximum": 200},
+                            "comentarioC3": {"type": "string", "minLength": 1, "maxLength": 400},
+                            "starsC3": {"type": "integer", "minimum": 0, "maximum": 5}
+                        },
+                    },
+                    "coesao": {
+                        "type": "object",
+                        "required": ["nota", "comentarioC4", "starsC4"],
+                        "additionalProperties": False,
+                        "properties": {
+                            "nota": {"type": "integer", "minimum": 0, "maximum": 200},
+                            "comentarioC4": {"type": "string", "minLength": 1, "maxLength": 400},
+                            "starsC4": {"type": "integer", "minimum": 0, "maximum": 5}
+                        },
+                    },
+                    "intervencao": {
+                        "type": "object",
+                        "required": ["nota", "comentarioC5", "starsC5"],
+                        "additionalProperties": False,
+                        "properties": {
+                            "nota": {"type": "integer", "minimum": 0, "maximum": 200},
+                            "comentarioC5": {"type": "string", "minLength": 1, "maxLength": 400},
+                            "starsC5": {"type": "integer", "minimum": 0, "maximum": 5}
+                        },
+                    },
                 },
             },
             "nota_total": {"type": "integer", "minimum": 0, "maximum": 1000},
@@ -68,3 +109,4 @@ SCHEMA = {
     },
     "strict": True,
 }
+
