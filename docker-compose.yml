@@ -2,23 +2,31 @@ version: "3.9"
 
 services:
   db:
-    image: postgres:16
-    container_name: aurora_postgres
+    image: postgres:15
+    container_name: aurora_db
     restart: always
     environment:
-      POSTGRES_DB: aurora-database
-      POSTGRES_USER: aurora
-      POSTGRES_PASSWORD: 5e5i_aurora
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 5e5iaurora
+      POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - "3005:5432"              
     volumes:
-      - aurora_data:/var/lib/postgresql/data
-    networks:
-      - aurora_network
+      - pg_data:/var/lib/postgresql/data
+
+  fastapi:
+    build: .
+    container_name: aurora_api
+    restart: always
+    depends_on:
+      - db
+    environment:
+      
+      DB_URL: postgresql+psycopg2://postgres:5e5iaurora@db:5432/postgres
+    ports:
+      - "80:8000"                 
+    command: >
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
-  aurora_data:
-
-networks:
-  aurora_network:
-    driver: bridge
+  pg_data:
